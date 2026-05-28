@@ -19,9 +19,9 @@ def rounding(x, ndigits=0):
     exponent = Decimal(f"1e-{ndigits}") if ndigits > 0 else Decimal('1')
     return float(d.quantize(exponent, rounding=ROUND_HALF_UP))
 
-def percentage_change(from_a, to_b):
-    x = ((to_b - from_a) / from_a) * 100
-    return (f"Net change: {x} %")
+def change(from_a, to_b):
+    x = (to_b - from_a) / from_a
+    return x
 
 def x_2(a=0, b=0, c=0):
     x = sp.symbols("x")
