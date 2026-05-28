@@ -135,40 +135,41 @@ class StockCalculator:
         S0 = self.input1
         mu = self.input2
         sigma = self.input3
-        T = self.input4
-        N = 252
+        months = self.input4  # self.input4 現在代表「模擬幾個月」，例如：1 或 3
         n_sim = self.input5
 
-        dt = T / N      # Time step size
+        N = int(21 * months)
+
+        T_in_years = months / 12.0
+
+        dt = T_in_years / N
 
         stock_prices = np.zeros((N + 1, n_sim))
         stock_prices[0] = S0
 
         # Generate random variables from standard normal distribution
-        # Size: (Number of days, Number of simulations)
         Z = np.random.standard_normal((N, n_sim))
 
         # Simulate price paths day by day
         for t in range(1, N + 1):
-            # GBM formula: S_t = S_{t-1} * exp( (mu - 0.5*sigma^2)*dt + sigma*Z*sqrt(dt) )
-            drift = (mu - 0.5 * sigma**2) * dt
+            # GBM formula (dt is still based on year fraction, which is correct)
+            drift = (mu - 0.5 * sigma ** 2) * dt
             shock = sigma * Z[t - 1] * np.sqrt(dt)
             stock_prices[t] = stock_prices[t - 1] * np.exp(drift + shock)
 
-
         fig, ax = plt.subplots(1, 2, figsize=(15, 6))
 
-        # Plot 1: Simulated Price Paths (Show first 100 paths for clarity)
+        # Plot 1: Simulated Price Paths
         ax[0].plot(stock_prices[:, :100], linewidth=1)
-        ax[0].set_title("Monte Carlo Simulation: Price Paths (First 100 Paths)")
-        ax[0].set_xlabel("Time Steps (Days)")
+        ax[0].set_title(f"Monte Carlo Simulation: Price Paths (First 100 Paths)")
+        ax[0].set_xlabel(f"Time Steps (Trading Days over {months} Month(s))")
         ax[0].set_ylabel("Stock Price")
         ax[0].grid(True, linestyle="--", alpha=0.6)
 
-        # Plot 2: Histogram of Terminal Stock Prices (Ending Day Distribution)
+        # Plot 2: Histogram of Terminal Stock Prices
         terminal_prices = stock_prices[-1, :]
         ax[1].hist(terminal_prices, bins=50, edgecolor='black', alpha=0.7, density=True)
-        ax[1].set_title(f"Distribution of Terminal Prices at T = {T} Year")
+        ax[1].set_title(f"Distribution of Terminal Prices at T = {months} Month(s)")
         ax[1].set_xlabel("Stock Price")
         ax[1].set_ylabel("Density")
         ax[1].grid(True, linestyle="--", alpha=0.6)
@@ -215,7 +216,7 @@ def main():
         info.append(info2 := float(input("Please input the average target price of the stock: ")))
         info[1] = change(info1,info2)
         info.append(info3 := float(input("Please input the HV or IV of the stock: ")))
-        info.append(info4 := float(input("Please input the year of the simulation: ")))
+        info.append(info4 := float(input("Please input the months of simulation: ")))
         info.append(info5 := int(input("Please input the number of the simulation paths: ")))
 
         simulate = StockCalculator(None, info[0], info[1], info[2], info[3], info[4])
