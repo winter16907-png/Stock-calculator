@@ -207,7 +207,7 @@ def main():
         info.append(info1 := float(input("Please input the buy price of the stock: ")))
         info.append(info2 := float(input("Please input the quantity of the stock: ")))
 
-        stock = StockCalculator(region, info[0], info[1], None, None)
+        stock = StockCalculator(region, info[0], info[1], None, None, None)
         print(stock.find_break_even_price())
 
     elif tool == "b":
